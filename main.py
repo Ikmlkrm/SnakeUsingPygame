@@ -141,6 +141,22 @@ class Snake:
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
         self.direction = Vector2(0, 0)
 
+    def start_game(self):
+
+
+        game_over_text = str("SNAKE")
+        game_over_surface = game_over_font.render(game_over_text, True, (0, 0, 0))
+        game_over_rect = game_over_surface.get_rect()
+        game_over_rect.center = (cell_size * cell_number // 2, 150)
+        screen.blit(game_over_surface, game_over_rect)
+
+        continue_game_text = "Press WASD to start"
+        continue_game_surface = continue_game_font.render(continue_game_text, True, (0, 0, 0))
+        continue_game_rect = continue_game_surface.get_rect()
+        continue_game_rect.center = (cell_size * cell_number // 2, 250)
+        screen.blit(continue_game_surface, continue_game_rect)
+
+
 
 
     def game_over_screen(self):
@@ -188,21 +204,30 @@ class Main:
     def __init__(self):
         self.snake = Snake()
         self.fruit = Fruit()
+        self.high_score = 0
+        self.game_start = False
 
         self.game_over_flag = False
         logging.info(f"1. game over flag value: {self.game_over_flag}")
 
     def update(self):
-        self.snake.move_snake()
-        self.check_collision()
-        self.check_fail()
+        if self.game_start:
+            self.snake.move_snake()
+            self.check_collision()
+            self.check_fail()
 
     def draw_elements(self):
         self.draw_grass()
         self.fruit.draw_fruit()
         self.snake.draw_snake()
         self.draw_score()
-        self.snake.game_over_screen()
+        self.draw_high_score()
+
+        if not self.game_start:
+            self.snake.start_game()
+
+        if self.game_start:
+            self.snake.game_over_screen()
 
 
     def check_collision(self):
@@ -263,6 +288,7 @@ class Main:
         score_y = int(cell_size*cell_number-40)
         score_rect = score_surface.get_rect(center = (score_x, score_y))
 
+
         apple_rect = apple.get_rect(midright = (score_rect.left, score_rect.centery))
 
         bg_rect = pygame.Rect(apple_rect.left - 5, apple_rect.top - 2,(apple_rect.width + score_rect.width + 10), apple_rect.height +4)
@@ -272,8 +298,24 @@ class Main:
         screen.blit(apple, apple_rect)
         pygame.draw.rect(screen, (0,0,0), bg_rect,2)
 
-        # Add high score
-        # ...
+    def draw_high_score(self):
+        score_text = len(self.snake.body) - 3
+
+        if score_text > self.high_score:
+            self.high_score = score_text
+
+        high_score_text = str(f"HI:{self.high_score}")
+
+        score_surface = high_score_font.render(high_score_text,True,(1, 70, 1))
+        score_x = int(cell_size*cell_number-60)
+        score_y = int(cell_size*cell_number-30)
+        score_rect = score_surface.get_rect(center = (score_x, score_y))
+        bg_rect = pygame.Rect(score_rect.left - 5, score_rect.top -4, score_rect.width+10, score_rect.height+6)
+
+        pygame.draw.rect(screen, (225,191,146), bg_rect)
+        screen.blit(score_surface, score_rect)
+        pygame.draw.rect(screen, (0,0,0), bg_rect,2)
+
 
 class Start:
     def __init__ (self):
@@ -297,9 +339,10 @@ clock = pygame.time.Clock()
 
 apple = pygame.image.load('Graphics/watermelon.png')
 
-game_font = pygame.font.Font('Graphics/game_font.ttf', 30)
+game_font = pygame.font.Font('Graphics/game_font_2.ttf', 30)
 game_over_font = pygame.font.Font('Graphics/robust.ttf', 150)
 continue_game_font = pygame.font.Font('Graphics/robust.ttf', 50)
+high_score_font = pygame.font.Font('Graphics/game_font_2.TTF', 30)
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE, 150)
@@ -321,21 +364,25 @@ while True:
         if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     main_game.game_over_flag = False
+                    main_game.game_start = True
                     if main_game.snake.direction.y != 1:
                         main_game.snake.direction = Vector2(0, -1)
 
                 if event.key == pygame.K_s:
                     main_game.game_over_flag = False
+                    main_game.game_start = True
                     if main_game.snake.direction.y != -1:
                         main_game.snake.direction = Vector2(0, 1)
 
                 if event.key == pygame.K_d:
                     main_game.game_over_flag = False
+                    main_game.game_start = True
                     if main_game.snake.direction.x != -1:
                         main_game.snake.direction = Vector2(1, 0)
 
                 if event.key == pygame.K_a:
                     main_game.game_over_flag = False
+                    main_game.game_start = True
                     if main_game.snake.direction.x != 1:
                         main_game.snake.direction = Vector2(-1, 0)
 
