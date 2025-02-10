@@ -1,6 +1,6 @@
 # Snake Game
-Created using Pygame
-Controls: WASD for movement
+Created using Pygame </br>
+Controls: WASD for movement </br>
 
 # Game Screenshots
 ![Screenshot1](Image_1.JPG)</br>
